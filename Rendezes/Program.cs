@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ImageSharp;
 
 namespace Rendezes {
     class Program {
@@ -15,17 +16,19 @@ namespace Rendezes {
             Console.ReadKey();
         }
 
-        private static void TestSorter(ISorter<int> sorter) {
+        private static void TestSorter(Sorter<int> sorter) {
             Random r = new Random();
 
             Console.WriteLine("Testing: " + sorter.GetType().Name);
 
-            int[] amounts = new int[] { 1, 10, 100, 1000, 10000 };
+            int[] amounts = new int[] { 100, 1000, 10000, 20000 };
 
             foreach (int amount in amounts) {
                 List<int> data = new List<int>();
                 List<int> original = new List<int>();
                 List<int> expected = new List<int>();
+
+                //sorter.EnableSaveStates = amount <= 100;
 
                 while (data.Count < amount) {
                     int c = r.Next(0, 99999);
@@ -63,6 +66,32 @@ namespace Rendezes {
                     Console.WriteLine($"PASSED ({amm} items {sw.Elapsed})");
                 } else {
                     Console.WriteLine($"FAILED ({amm} items {sw.Elapsed})");
+                }
+
+                if (sorter.EnableSaveStates) {
+                    Console.WriteLine("Saving images...");
+                    List<int[]> steps = sorter.getStates();
+                    int stepnum = 1;
+                    foreach (int[] state in steps) {
+                        int height = (amount / 16 * 9);
+                        Image<Rgba32> img = new Image<Rgba32>(amount, height);
+                        for (int x = 0; x < amount; x++) {
+                            int convval = (int)Math.Floor((double)state[x] / 99999 * height);
+
+                            for (int h = 0; h < height; h++) {
+                                int y = height - h - 1;
+
+                                if (h > convval) {
+                                    img[x, y] = Rgba32.White;
+                                } else {
+                                    img[x, y] = Rgba32.DarkGreen;
+                                }
+                            }
+                        }
+                        //img.Resize(1920, 1080);
+                        img.Save("D:\\sort\\" + sorter.GetType().Name + "-" + amount + "-" + stepnum + ".png");
+                        stepnum++;
+                    }
                 }
 
             }

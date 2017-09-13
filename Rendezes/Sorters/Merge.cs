@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Rendezes.Sorters {
-    class Merge : ISorter<int> {
+    class Merge : Sorter<int> {
 
-        public void Sort(ref List<int> input) {
+        public override void Sort(ref List<int> input) {
             SplitI(ref input, 0, input.Count - 1);
         }
 
@@ -44,6 +44,8 @@ namespace Rendezes.Sorters {
                     index++;
                     index2++;
                 }
+
+                this.SaveState(ref copy);
             }
 
             original = copy;

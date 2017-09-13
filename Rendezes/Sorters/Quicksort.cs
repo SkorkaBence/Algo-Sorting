@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Rendezes.Sorters {
-    class Quicksort : ISorter<int> {
+    class Quicksort : Sorter<int> {
 
-        public void Sort(ref List<int> input) {
+        public override void Sort(ref List<int> input) {
             Qsort(ref input, 0, input.Count - 1);
         }
 
@@ -26,12 +26,14 @@ namespace Rendezes.Sorters {
                     int x = A[i];
                     A[i] = A[j];
                     A[j] = x;
+                    this.SaveState(ref A);
                 }
             }
             if (A[to] < A[i + 1]) {
                 int x = A[i + 1];
                 A[i + 1] = A[to];
                 A[to] = x;
+                this.SaveState(ref A);
             }
             return i + 1;
         }
